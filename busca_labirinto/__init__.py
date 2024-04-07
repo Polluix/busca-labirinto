@@ -1,8 +1,33 @@
 from pyamaze import maze, agent
 from random import randint, choice
 
+class No():
+    def __init__(self) -> None:
+        self.coord: tuple = () #coordenada da célula no labirinto
+        self.nos: list = [] #coordenada das células que são caminhos válidos a partir do nó atual
 
+    def setCoord(self, coord:tuple) -> None:
+        self.coord = coord
 
+    def criaNos(self) -> None:
+        #cria novos nós a partir das informações do mapa do labirinto em lab.maze_map
+        info = MAPA[self.coord] #obtém informações de caminhos disponíveis
+
+        coord = ()
+
+        for key, value in info.items():
+            if value==1:
+                if key!='E':
+                    if key!='W':
+                        if key!='N':
+                            coord = (self.coord[0]+1, self.coord[1]) #se vai para o sul
+                        else: coord = (self.coord[0]-1, self.coord[1]) #se vai para o norte
+                    else: coord = (self.coord[0], self.coord[1]-1) #se vai para o oeste
+                else: coord = (self.coord[0]+1, self.coord[1]) #se vai para o leste
+
+                novoNo = No() #cria o nó do próximo passo
+                novoNo.setCoord(coord) #seta as coordenadas do novo nó a partir do mapa
+                self.nos.append(novoNo) #adiciona o no como seguinte
 
 
 def createMaze(size=10):
@@ -23,14 +48,16 @@ def createMaze(size=10):
         column = randint(1, eval(size))
 
 
-    lab.CreateMaze(line, column,loopPercent=50)
-    mapa = lab.maze_map
+    lab.CreateMaze(line, column,loopPercent=15)
+    
     agente = agent(lab)
+    
     lab.run()
 
-    return lab
+    return lab, agente
 
 a = input('Tamanho do labirinto: ')
 
-lab = createMaze(a)
-print(lab.maze_map) #1 quando pode ir, 0 quando não pode ir
+lab, agente = createMaze(a)
+
+MAPA = lab.maze_map
