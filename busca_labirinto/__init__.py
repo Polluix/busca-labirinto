@@ -47,7 +47,6 @@ def createMaze(size=10):
         line = 1
         column = randint(1, eval(size))
 
-
     lab.CreateMaze(line, column,loopPercent=15)
     
     agente = agent(lab)
@@ -60,4 +59,17 @@ a = input('Tamanho do labirinto: ')
 
 lab, agente = createMaze(a)
 
-MAPA = lab.maze_map
+MAPA = lab.maze_map #constante usada na criação de nós
+
+#1 quando pode ir, 0 quando não pode ir
+# testa criação dos nós
+# no1 = No()
+# no1.setCoord((5,5))
+# no1.criaNos()
+# [print(i.coord) for i in no1.nos]
+
+# TODO1 : Implementar loop de verificação de cada nó usando a busca em largura
+# TODO2: A solução deve conter as coordenadas de cada célula do caminho a ser percorrido
+# TODO2: e deve ser comparada com a solução ótima proposta pelo próprio pyamaze
+# TODO3: exibir o caminho percorrido no labirinto (mostrar o encontrado pelo código e
+# TODO4: pelo pyamaze, caso sejam diferentes)
