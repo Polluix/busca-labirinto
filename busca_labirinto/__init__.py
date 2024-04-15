@@ -33,10 +33,12 @@ class No():
                 elif key=='N': coord = (self.coord[0]-1, self.coord[1]) #se vai para o norte
                 elif key=='S': coord = (self.coord[0]+1, self.coord[1]) #se vai para o sul
                 
+                
                 novoNo = No() #cria o nó do próximo passo
                 novoNo.setCoord(coord) #seta as coordenadas do novo nó a partir do mapa
+            
                 self.nos.append(novoNo) #adiciona o no como seguinte
-
+               
 
 def createMaze(size=10):
 
@@ -56,7 +58,7 @@ def createMaze(size=10):
         column = randint(1, eval(size))
 
     lab.CreateMaze(line, column,
-                   loopPercent=0.5,
+                   loopPercent=15,
                    )
     
     agente = agent(lab)
@@ -74,8 +76,6 @@ size = input('Tamanho do labirinto: ')
 lab, agente, line, column = createMaze(size)
 
 MAPA = lab.maze_map #constante usada na criação de nós
-
-visitados = []
 
 initial_line = size
 initial_column = size
@@ -120,62 +120,66 @@ nodes = initial_node.nos
     # acessa no, verifica saida, senao, cria nos, volta pro anterior (usando atributo da classe)
 
 i = 0 # controla a iteração de acesso aos nos
+visitado = []
+visitado.append(initial_node.coord)
 
-while initial_column!=column and initial_line!=line: #verifica se não está na saída
-    
-    if i==0:
-        for node in nodes:
-            coord_line, coord_column = node.coord
-            node.visitado = True
-            # print(coord_line, coord_column)
-
-            node.criaNos()                             #cria os nós filhos para o próximo passo
+def buscaLargura(node):
+    if node.coord not in visitado:
+        visitado.append(node.coord)
+        coord_line, coord_column = node.coord
+        # print(coord_line, coord_column)
+        
+        if coord_line!=line or coord_column!=column: #verifica se não são as coordenadas da saída
+            print('Não é a saída')
+            node.criaNos()               #cria os nós filhos para o próximo passo
             for children in node.nos:
                 children.setAnterior(node)
+        
+            return node
+        
+        elif coord_line==line and coord_column==column:
+            print('É a saída')
+            visitados = []
+            while node!=None:
+                visitados.append(node.coord)
+                node = node.anterior
+            visitados.append((eval(size),eval(size)))
+            
+            return visitados
     else:
-        for j in range(len(nodes)):
-            node = nodes[j]
-            if node.visitado==False:
-                node.visitado = True
-                coord_line, coord_column = node.coord
-                # print(coord_line, coord_column)
-                
-                if coord_line!=line or coord_column!=column: #verifica se não são as coordenadas da saída
-                    print('Não é a saída')
-                    node.criaNos()                             #cria os nós filhos para o próximo passo
-                    # print('nao sao iguais')
-                    for children in node.nos:
-                        children.setAnterior(node)
-
-                elif coord_line==line and coord_column==column:
-                    print('É a saída')
-                    # print('sao iguais')
-                    while node!=None:
-                        visitados.append(node.coord)
-                        node = node.anterior
-                        
-                    tupla_coord = (eval(size),eval(size))
-                    visitados.append(tupla_coord)
-                    initial_column=column
-                    initial_line=line
-                    break
-
-        n_nos = []
-        n_nos.append(len(nodes))
-
-    new = []
-    for node in nodes:
-        for no in node.nos:
-            new.append(no)
+        return node
     
-    nodes.clear()
+from joblib import Parallel, delayed
+
+cont = 0
+resultado = Parallel(n_jobs=2)(delayed(buscaLargura)(node) for node in nodes)
+
+cont+=len(resultado) #controle de avaliações
+
+controle = True
+while controle:
+    
+    new = []
+    for node in resultado:
+        if type(node)!=list:
+            for no in node.nos:
+                new.append(no)
+
     nodes = new
     new = []
-    i+=1
+
+    resultado = Parallel(n_jobs=None)(delayed(buscaLargura)(node) for node in nodes)
+    cont+=len(resultado)
+
+    for r in resultado:
+        if type(r)==list:
+            resultado = r
+            controle = False
+    
+print(resultado)
 fim = time.time()
-print(visitados)
 print(f'tempo de busca: {fim-inicio:.2f} s')
-print(f'nós avaliados: {n_nos}')
+print(f'processos executados: {cont}')
 # print(lab.path)
 lab.run()
 
