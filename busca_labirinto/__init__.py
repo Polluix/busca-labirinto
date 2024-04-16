@@ -65,10 +65,6 @@ def createMaze(size=10):
 
     return lab, agente, line, column
 
-def marca_visitado(node):
-    node.visitado = True
-    return node
-
 inicio = time.time()
 
 size = input('Tamanho do labirinto: ')
@@ -85,9 +81,9 @@ initial_node.setCoord((initial_line, initial_column))
 initial_node.criaNos()
 
 # TODO1 : arrumar lógica da avaliação de cada nó
-#* busca em profundidade
 nodes = initial_node.nos
-# i = 0
+
+#* busca em profundidade
 # while initial_column!=column and initial_line!=line: #verifica se não está na saída
     
 #     for node in nodes:  #itera pelos nos mais profundos a cada passo
@@ -112,13 +108,6 @@ nodes = initial_node.nos
 #     break
 
 #* busca em largura
-# acessa nós
-# le coordenada
-# se for saída, para o laço
-# se não for saída, criaNos()
-#acesa a lista de nós, abrindo um por um, criando nós enquanto nao chegar na saída
-    # acessa no, verifica saida, senao, cria nos, volta pro anterior (usando atributo da classe)
-
 i = 0 # controla a iteração de acesso aos nos
 visitado = []
 visitado.append(initial_node.coord)
