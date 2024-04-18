@@ -1,7 +1,6 @@
 from pyamaze import maze, agent
 from random import randint, choice
 import time
-import os
 
 class No():
     def __init__(self) -> None:
@@ -62,7 +61,7 @@ def createMaze(size=10):
                    loopPercent=15,
                    )
     
-    agente = agent(lab,filled=True,footprints=True)
+    agente = agent(lab,footprints=True)
 
     return lab, agente, line, column
 
@@ -83,43 +82,16 @@ initial_node = No()
 initial_node.setCoord((initial_line, initial_column))
 initial_node.criaNos()
 
-# TODO1 : arrumar lógica da avaliação de cada nó
-nodes = initial_node.nos
+nodes_largura = initial_node.nos
+nodes_profundidade = initial_node.coord
 
 opcoes = eval(input('Deseja executar qual método de busca?\n1: Busca em largura\n2: Busca em profundidade\n3: Ambas\nResposta: '))
 print('-------------------------------------------------------')
-#* busca em profundidade
-# while initial_column!=column and initial_line!=line: #verifica se não está na saída
-    
-#     for node in nodes:  #itera pelos nos mais profundos a cada passo
-#         coord_line, coord_column = node.coord
 
-#         if coord_line!=line and coord_column!=column: #verifica se não são as coordenadas da saída
-#             node.criaNos()                             #cria os nós filhos para o próximo passo
-#             for children in node.nos:
-#                 children.setAnterior(node)
-
-#         elif coord_line==line and coord_column==column:
-#             initial_column = coord_column
-#             initial_line = coord_line
-    
-#     new = []
-#     for node in nodes:
-#         for node in node.nos:
-#             new.append(node)
-#     nodes.clear()
-#     nodes = new
-#     [print(i.coord) for i in nodes]
-#     break
-
-#* busca em largura
-i = 0 # controla a iteração de acesso aos nos
-visitado = []
-visitado.append(initial_node.coord)
-
-def testeObjetivoBuscaLargura(node, coord_line, coord_column):
+def testeObjetivo(node, coord_line, coord_column):
     
     if coord_line!=line or coord_column!=column: #verifica se não são as coordenadas da saída
+        node.visitado = True
         node.criaNos()               #cria os nós filhos para o próximo passo
         for children in node.nos:
             children.setAnterior(node)
@@ -136,12 +108,76 @@ def testeObjetivoBuscaLargura(node, coord_line, coord_column):
         
         return visitados
 
+def testSaida(no):
+    return True if no==(line, column) else False
+
+def sucessorProfundidade(visitados, controle):
+    caminho = {}
+    i = 0
+    while len(controle)>0:
+        no = controle.pop()
+        i+=1
+        if testSaida(no)==True:
+            print('É a saída!')
+            break
+        for direcao in 'ESNW':
+            if lab.maze_map[no][direcao]==True:
+                if direcao=='E': proximo = (no[0], no[1]+1) #se vai para o leste
+                elif direcao=='W': proximo = (no[0], no[1]-1) #se vai para o oeste
+                elif direcao=='N': proximo = (no[0]-1, no[1]) #se vai para o norte
+                elif direcao=='S': proximo = (no[0]+1, no[1]) #se vai para o sul
+                if proximo in visitados: continue
+                visitados.append(proximo)
+                controle.append(proximo)
+                caminho[proximo] = no
+    return caminho, i
+
+def buscaProfundidade(node):
+    
+    visitados = [node]
+    controle = [node]
+    
+    caminho, custo_total = sucessorProfundidade(visitados, controle)
+    new_caminho={}
+    cell=(line,column)
+    while cell !=node:
+        new_caminho[caminho[cell]]=cell
+        cell=caminho[cell]
+    return new_caminho, custo_total
+
+    
+def executa_busca_profundidade(node):
+    print('Executando busca em profundidade...')
+    inicio = time.time()
+
+    resultado, custo_total = buscaProfundidade(node)
+
+    fim = time.time()
+    filename = 'resultado_busca_em_profundidade.txt'
+
+    with open(filename, mode='w') as file:
+        file.write(str(resultado))
+        file.close()
+
+    print(f'Verifique a solução no arquivo: {filename}')
+    print(f'Tempo de busca: {fim-inicio:.2f} s')
+    print(f'Quantidade de nós percorridos até a saída (custo da solução): {len(resultado)}')
+    print(f'Quantidade de nós avaliados (custo total): {custo_total}')
+    if opcoes==2:
+        print('A solução será mostrada no labirinto. O caminho em azul foi encontrado pela busca, o caminho em amarelo pelo próprio módulo que cria o labirinto.')
+    print('-------------------------------------------------------')
+
+    return resultado
+
+visitado = []
+visitado.append(initial_node.coord)
+
 def buscaLargura(node):
     if node.coord not in visitado:
         visitado.append(node.coord)
         coord_line, coord_column = node.coord
 
-        resultado_teste = testeObjetivoBuscaLargura(node, coord_line,coord_column)    
+        resultado_teste = testeObjetivo(node, coord_line,coord_column)    
 
         return resultado_teste
     
@@ -150,7 +186,7 @@ def buscaLargura(node):
     
 from joblib import Parallel, delayed
 
-def sucessor(controle, resultado, cont):
+def sucessorLargura(controle, resultado, cont):
         new = []
         for node in resultado:
             if type(node)!=list:
@@ -183,7 +219,7 @@ def executa_busca_largura(nodes):
     cont = custoTotal(cont, len(resultado)) #função custo
     controle = True
     while controle:
-        controle, resultado, cont = sucessor(controle, resultado, cont)
+        controle, resultado, cont = sucessorLargura(controle, resultado, cont)
 
     fim = time.time()
     filename = 'resultado_busca_em_largura.txt'
@@ -202,25 +238,43 @@ def executa_busca_largura(nodes):
     print(f'Tempo de busca: {fim-inicio:.2f} s')
     print(f'Quantidade de nós avaliados (custo total): {cont}')
     print(f'Quantidade de nós percorridos até a saída (custo da solução): {len(resultado)}')
-    print('A solução será mostrada no labirinto. O caminho em azul foi encontrado pela busca, o caminho em amarelo pelo próprio módulo que cria o labirinto.')
+    if opcoes==1:
+        print('A solução será mostrada no labirinto. O caminho em azul foi encontrado pela busca, o caminho em amarelo pelo próprio módulo que cria o labirinto.')
     print('-------------------------------------------------------')
 
     return dictL
 
 if opcoes==1:
-    solucao_largura = executa_busca_largura(nodes)
+    solucao_largura = executa_busca_largura(nodes_largura)
 
-    agente2 = agent(lab,filled=True,footprints=True, color='yellow')
+    agente2 = agent(lab,footprints=True, color='yellow')
 
     lab.tracePath({agente:solucao_largura})
     lab.tracePath({agente2:lab.path})
 
+    lab.run()
+elif opcoes==2:
+    solucao_profundidade = executa_busca_profundidade(nodes_profundidade)
+    agente2 = agent(lab,footprints=True, color='yellow')
+
+    lab.tracePath({agente:solucao_profundidade})
+    lab.tracePath({agente2:lab.path})
 
     lab.run()
+elif opcoes==3:
 
+    solucao_largura = executa_busca_largura(nodes_largura)
 
+    agente2 = agent(lab,footprints=True, color='yellow')
 
-# TODO2: A solução deve conter as coordenadas de cada célula do caminho a ser percorrido
-# TODO2: e deve ser comparada com a solução ótima proposta pelo próprio pyamaze
-# TODO3: exibir o caminho percorrido no labirinto (mostrar o encontrado pelo código e
-# TODO4: pelo pyamaze, caso sejam diferentes)
+    solucao_profundidade = executa_busca_profundidade(nodes_profundidade)
+
+    agente3 = agent(lab,footprints=True, color='red')
+
+    print('''A solução será mostrada no labirinto. O primeiro caminho é da busca em largura (azul), o segundo da busca em profundidade(amarelo)
+          e o terceiro o resultado dado pelo próprio módulo do labirinto (vermelho)''')
+
+    lab.tracePath({agente:solucao_largura})
+    lab.tracePath({agente2:solucao_profundidade})
+    lab.tracePath({agente3:lab.path})
+    lab.run()
