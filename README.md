@@ -7,6 +7,10 @@
 
   `python -m venv .venv`
 
+- instalar o módulo virtualenv:
+
+  `pip install virtualenv`
+
 - ativar o ambiente virtual acessando o script de ativação utilizando o comando:
 
   `.venv/Scripts/activate`
