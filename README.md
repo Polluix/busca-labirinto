@@ -17,7 +17,7 @@
 
 - acessar a pasta do script principal
 
-  `cd busca-labirinto`
+  `cd busca_labirinto`
 
 - executar o script
 
