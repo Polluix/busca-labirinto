@@ -5,7 +5,7 @@
 - instalar o Python 3.11
 - criar o ambiente virtual na pasta raiz do projeto utilizando o comando:
 
-  `python venv .venv`
+  `python -m venv .venv`
 
 - ativar o ambiente virtual acessando o script de ativação utilizando o comando:
 
