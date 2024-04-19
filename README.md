@@ -21,7 +21,7 @@
 
 - executar o script
 
-  `python __init__.py
+  `python __init__.py`
 
 - as demais instruções serão impressas no terminal, nas quais o usuário pode escolher o tamanho do labirinto (mínimo 2) digitando um inteiro que represente o numero de células de cada lado (labirinto quadrado):
 
