@@ -42,7 +42,7 @@ O resultado será mostrado na janela do Python que será aberta logo após a exe
 ![visualização](https://github.com/Polluix/busca-labirinto/blob/main/assets/exemplo-solucao.png)
 
 ## Observações relevantes
- - A busca em largura foi implementada utilizando-se orientação a objetos, o que gerou uma carga bem grande para o computador durante a execução, chegando a utilizar 13 gb de memória RAM em labirintos grandes (maiores que 10x10). Por conta disso, a implementação foi otimizada, excluindo nós que já foram avaliados anteriormente e utilizando paralelismo de processos do módulo ![joblib](https://joblib.readthedocs.io/en/stable/) do Python, tornando o método menos custoso computacionalmente.
+ - A busca em largura foi implementada utilizando-se orientação a objetos, o que gerou uma carga bem grande para o computador durante a execução, chegando a utilizar 13 gb de memória RAM em labirintos grandes (maiores que 10x10). Por conta disso, a implementação foi otimizada, excluindo nós que já foram avaliados anteriormente e utilizando paralelismo de processos do módulo [joblib](https://joblib.readthedocs.io/en/stable/) do Python, tornando o método menos custoso computacionalmente.
  - Visando evitar o custo elevado do método de busca em largura encontrado na implementação orientada a objetos, a busca em profundidade foi implementada a partir da manipulação de listas e variáveis auxiliares de controle de iteração, economizando memória
 
 
