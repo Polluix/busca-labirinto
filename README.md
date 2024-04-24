@@ -17,6 +17,10 @@ Autores: Camille Grajauskas Gonçalves (22101864) e Luiz Felipe Camargo Souza (2
 
   `.venv/Scripts/activate`
 
+- garanta que o arquivo .venv/pyvenv.cfg especifique que o Python 3.11 é a versão do projeto, do contrário, as dependências não poderão ser instaladas
+
+![exemplo pyvenv](https://github.com/Polluix/busca-labirinto/blob/main/assets/venv-config.png)
+
 - fazer a instalação das dependências a partir do arquivo requirements.txt utilizando o comando pip:
 
   `pip install -r requirements.txt`
