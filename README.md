@@ -1,6 +1,7 @@
 # Algoritmos de busca em largura e profundidade para um labirinto - Sitemas Inteligentes (EMB5617)
 
 Autores: Camille Grajauskas Gonçalves (22101864) e Luiz Felipe Camargo Souza (20103282)
+
 ![GitHub License](https://img.shields.io/github/license/Polluix/busca-labirinto)
 
 ## Como executar o script
